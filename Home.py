@@ -1,3 +1,5 @@
+# Home.py. Vi skal utføre deconceal som 
+
 from SUCI_util import *
 from cryptography import exceptions
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -5,7 +7,8 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 PRIVPW   = bytes("BTS4410 Høsten 2025","utf-8")
 
-cmd = cmd_arg([CMD_KEYGEN,CMD_DECONCEAL])
+cmd = cmd_arg([CMD_KEYGEN,CMD_DECONCEAL]) #her brukes keygen og deconceal som commands.
+#cmd = CMD_DECONCEAL #her brukes kun deconceal
 
 if cmd==None:
     err_print("\nNo valid command given.")
@@ -39,13 +42,43 @@ if cmd==CMD_DECONCEAL:
     f.close()
     print("    Loaded: "+SUCI_FILE_NAME+", Length:",len(raw_suci_data))
     
-    #*******************************************************
-    #    
-    #      You must complete this part -- Good luck!
-    #
-    #*******************************************************
-    print("\n    ***  To be completed  ***\n")
+   
+    IV = raw_suci_data[0:16]
+    len_home_ID = int.from_bytes(raw_suci_data[16:18])
+    home_ID_arr = 18 + len_home_ID
+    home_ID = raw_suci_data[18:home_ID_arr]
+    pubkey_len = int.from_bytes(raw_suci_data[80:82])
+    pubkey_arr = 82 + pubkey_len
+    pubkey = raw_suci_data[82:pubkey_arr]
+    ct_found = raw_suci_data[pubkey_arr:]
+    # Loading the Home Public key.
+    home_pub_key = load_public_key(PUB_PEM)
+        
+    # generate ephemeral key-pair
+    ephemeral_public_key = serialization.load_pem_public_key(pubkey)
+        
+    # generate shared key
+    dhs = priv_key.exchange(ec.ECDH(),ephemeral_public_key)
+        
+    # generating session key.
+    session_key = key_derivation(dhs)
     
+    aesgcm = AESGCM(session_key)
+    aad = IV + raw_suci_data[16:80] + raw_suci_data[80:pubkey_arr]
+    ct = aesgcm.decrypt(IV, ct_found, aad)
+    
+    len_ct = int.from_bytes(ct[0:2])
+    user_ID_arr = 2 + len_ct
+    user_ID = ct[2:user_ID_arr]
+
+    print("IV len:", len(IV))
+    print("Home ID len:", len_home_ID)
+    print("Public key len:", pubkey_len)
+    print("Entity name home:", home_ID.decode("utf-8"))
+    print("Public key:\n", pubkey.decode("utf-8"))
+    print(f"Ciphertext length:{len(ct_found)} (includes the tag)")
+    print("The de-concealed user entity name:", user_ID.decode("utf-8"))
+
     print("Home: Command completed.")    
     sys.exit(0)
 

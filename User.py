@@ -5,19 +5,26 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 #ENTITY_NAME_USER = "privacy-sensitive-name ÆØÅ"
-ENTITY_NAME_USER = "Luke Skywalker"
+#ENTITY_NAME_USER = "Luke Skywalker"
+ENTITY_NAME_USER = "Ole brumm"
 
-cmd = cmd_arg([CMD_CONCEAL])
+print("argv:", sys.argv) #sjekker bare riktig fil er begrenset til to "py"
+
+cmd = CMD_CONCEAL
+print("cmd:", cmd)
+
+#print(CMD_KEYGEN) #sjekker bare at cmd kjører. Samtidig skal man egentlig generere egne KEYS i dette steget også.
 
 if cmd==None:
     err_print("\nNo valid command given.")
     sys.exit(1)
 
 
+
 if cmd==CMD_CONCEAL:
     print("\nUser: Concealing a permanent identifier.")
     
-    # Loading the Home Pubic key.
+    # Loading the Home Public key.
     home_pub_key = load_public_key(PUB_PEM)
     
     # generate ephemeral key-pair
@@ -29,12 +36,25 @@ if cmd==CMD_CONCEAL:
     # generating session key.
     session_key = key_derivation(dhs)
     
+    
     # add length indicator and padding (as appropriate)
     # note: should check that the entity names have length <= 62 (*YOU ADD THAT*)
     utf8_home_ID = bytes(ENTITY_NAME_HOME,"utf-8")
     utf8_user_ID = bytes(ENTITY_NAME_USER,"utf-8")
-    home_ID = add_padding(add_len_prefix(utf8_home_ID),64)
-    user_ID = add_padding(add_len_prefix(utf8_user_ID),64)
+    #Sjekker om lengden på home id eller user id er for stor
+    if len(utf8_home_ID) <= 62:
+        home_ID = add_padding(add_len_prefix(utf8_home_ID),64)
+    else:
+        print("Entity Home Name too big!")
+        sys.exit(1)
+    
+    if len(utf8_user_ID) <= 62:
+        user_ID = add_padding(add_len_prefix(utf8_user_ID),64)
+    else:
+        print("Entity User Name too big!")
+        sys.exit(1)
+        
+    
     print("    Entity name home: '"+str(utf8_home_ID,"utf-8")+"'")
     print("    Entity name user: '"+str(utf8_user_ID,"utf-8")+"'")
     
@@ -59,3 +79,12 @@ if cmd==CMD_CONCEAL:
 
 err_print("\nSomething went wrong:",cmd)
 sys.exit(1)
+
+"""
+Output 1 (av conceal)
+User: Concealing a permanent identifier.
+    Entity name home: 'sidf@home.org'
+    Entity name user: 'Luke Skywalker'
+    SUCI_data written to file. Len: 340
+User: Command completed.
+"""
