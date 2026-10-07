@@ -6,7 +6,8 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 #ENTITY_NAME_USER = "privacy-sensitive-name ÆØÅ"
 #ENTITY_NAME_USER = "Luke Skywalker"
-ENTITY_NAME_USER = "Ole brumm"
+#ENTITY_NAME_USER = "Ole brumm"
+ENTITY_NAME_USER = "Albert Einstein"
 
 print("argv:", sys.argv) #sjekker bare riktig fil er begrenset til to "py"
 

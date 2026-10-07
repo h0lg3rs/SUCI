@@ -12,8 +12,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
 
 
-PUB_PEM  = "TEST_06/ECDH_PUBLIC_KEY.PEM"
-PRIV_PEM = "TEST_06/ECDH_PRIVATE_KEY.PEM"
+PUB_PEM  = "TEST_MAX2/ECDH_PUBLIC_KEY.PEM"
+PRIV_PEM = "TEST_MAX2/ECDH_PRIVATE_KEY.PEM"
 
 
 CMD_KEYGEN = "KEYGEN"
@@ -21,7 +21,7 @@ CMD_CONCEAL = "CONCEAL"
 CMD_DECONCEAL = "DECONCEAL"
 
 
-SUCI_FILE_NAME = "TEST_06/SUCI_data.bin"
+SUCI_FILE_NAME = "TEST_MAX2/SUCI_data.bin"
 
 
 KDF_APP_INFO = bytes("BTS4410 -- Oppgave 2","utf-8") #denne er interessant for identifisering
