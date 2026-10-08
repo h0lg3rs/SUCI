@@ -28,7 +28,7 @@ KDF_APP_INFO = bytes("BTS4410 -- Oppgave 2","utf-8") #denne er interessant for i
 
 # In SUCI this is a name used for routing the message back to Home.
 ENTITY_NAME_HOME ="sidf@home.org"   
-#ENTITY_NAME_HOME ="holgers@home.no"
+#ENTITY_NAME_HOME ="holgers@home.no" #testet med annet navn
 
 def cmd_arg(acceptable: list) -> str:
     """Check command-line args against 'acceptable' (list of strings).

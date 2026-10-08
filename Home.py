@@ -8,7 +8,6 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 PRIVPW   = bytes("BTS4410 Høsten 2025","utf-8")
 
 cmd = cmd_arg([CMD_KEYGEN,CMD_DECONCEAL]) #her brukes keygen og deconceal som commands.
-#cmd = CMD_DECONCEAL #her brukes kun deconceal
 
 if cmd==None:
     err_print("\nNo valid command given.")
@@ -51,18 +50,20 @@ if cmd==CMD_DECONCEAL:
     pubkey_arr = 82 + pubkey_len
     pubkey = raw_suci_data[82:pubkey_arr]
     ct_found = raw_suci_data[pubkey_arr:]
-    # Loading the Home Public key.
+    
+    # Laster inn Home Public key.
     home_pub_key = load_public_key(PUB_PEM)
         
-    # generate ephemeral key-pair
+    # henter public key fra binær filen
     ephemeral_public_key = serialization.load_pem_public_key(pubkey)
         
-    # generate shared key
+    # genererer hemmeligheten med bruk av egen private og tilsendt public
     dhs = priv_key.exchange(ec.ECDH(),ephemeral_public_key)
         
-    # generating session key.
+    # generer session key
     session_key = key_derivation(dhs)
     
+    # dekrypterer binærfilen med session key
     aesgcm = AESGCM(session_key)
     aad = IV + raw_suci_data[16:80] + raw_suci_data[80:pubkey_arr]
     ct = aesgcm.decrypt(IV, ct_found, aad)
@@ -71,6 +72,7 @@ if cmd==CMD_DECONCEAL:
     user_ID_arr = 2 + len_ct
     user_ID = ct[2:user_ID_arr]
 
+    #printer ut informasjon vi har funnet
     print("IV len:", len(IV))
     print("Home ID len:", len_home_ID)
     print("Public key len:", pubkey_len)
